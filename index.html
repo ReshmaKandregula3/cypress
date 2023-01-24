@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cypress</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="cont1">
+
+    
+    <h3>
+        You can use the cypress-multi-reporters package to create a JSON result report for Cypress BDD
+    </h3>
+    <h4>
+       <ol start="1">
+       <li>Install the package by running the command npm install --save-dev cypress-multi-reporters</li>
+       <br/> <li>In your cypress/plugins/index.js file, require and use the package like so:</li>
+       <br/>
+        <code>
+            const multiReporters = require('cypress-multi-reporters/reporter');
+           module.exports = (on, config) => {
+             on('task', multiReporters.getTask(config));
+            }
+        </code>
+        <br/><li>In your cypress.json file, configure the reporter to generate the JSON report by adding the following:</li>
+       <br/>
+        <code>
+            {
+                "reporter": "cypress-multi-reporters",
+                "reporterOptions": {
+                    "configFile": "cypress/reporter-options.json"
+                }
+             } 
+        </code>
+        <br/><li>Create a new file called reporter-options.json in the cypress folder and configure the reporter to generate a JSON report by adding the following:</li>
+       <br/>
+        <code>
+            {
+                "json": {
+                    "stdout": true,
+                    "options": {
+                        "file": "cypress/results/result.json"
+                    }
+                }
+             } 
+        </code>
+        <br/> <li>Run your cypress test and it will generate a JSON report in the cypress/results folder with the name result.json.</li>
+       </ol>
+    </h4>
+</div>
+<br/>
+    <div>
+        <h3>
+            You can use the cy.readFile command to read the JSON file and the cy.request command to send the data in the API body. Here is an example of how you can do this:
+        </h3>
+        <ol start="1">
+            <li>Add a new test case in your cypress test that will send the JSON report to the API.</li>
+            <br/><li>
+                In the test case, use the cy.readFile command to read the JSON file:
+            </li><br/>
+            <code>
+                cy.readFile('cypress/results/result.json').then((json) => {<br/>
+                    // json variable now contains the contents of the file<br/>
+                });<br/>
+                
+            </code><br/>
+            <li>In the same test case, use the cy.request command to send the data in the API body:</li>
+            <br/>
+            <code>
+                cy.request({
+                    method: 'POST',
+                    url: 'https://your-api-endpoint.com',
+                    body: json,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then((response) => {
+                    // response variable contains the response from the API
+                      });
+                    
+            </code>
+           <br/> <li>Run your cypress test and it will send the JSON report to the API.</li>
+        </ol>
+    </div>
+    <div>
+        <h3>
+You can use the Jira REST API to create or update issues with the test results. Here is an example of how you can do this:
+        </h3>
+        <ol start="1">
+            <li>Create a Jira API token by going to your Jira account settings and then to "Security."</li>
+            <br/><li>Use the Jira API token to authenticate and make API requests to Jira.</li>
+            <br/> <li>In the Cypress test case that sends the JSON report to the API, use the cy.readFile command to read the JSON file and extract the test results.</li>
+            <br/><li>Use the Jira REST API to create or update an issue for each test case, passing the test results as a payload in the API request.</li>
+            <br/> <li>For example, to create a new issue, you can use the following endpoint:</li>
+            <br/>  <code>
+POST https://<your-jira-url>/rest/api/2/issue <br/>
+
+            </code>
+            <br/>  <li>The payload should contain the test results, like this:</li>
+            <br/>  <code>
+                {
+                    "fields": {
+                       "project":
+                       { 
+                         "key": "PROJECT_KEY"
+                       },
+                       "summary": "Test case summary",
+                       "description": "Test case description",
+                       "issuetype": {
+                          "name": "Test"
+                       },
+                       "labels": [
+                          "cypress",
+                          "bdd"
+                       ],
+                       "customfield_123": "passed" 
+                    }
+                  }
+                  
+            </code>
+            <br/>   <li>If you want to update an existing issue, you can use the following endpoint:</li>
+            <br/> <code>
+                PUT https://<your-jira-url>/rest/api/2/issue/{issueIdOrKey}<br/>
+                    </code>
+                    <br/>  <li>Make sure to schedule the test to run automatically at the desired frequency to keep the Jira issues updated.</li>
+        </ol>
+    </div>
+</body>
+</html>
